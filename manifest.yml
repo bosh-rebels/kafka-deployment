@@ -1,0 +1,183 @@
+---
+jobs_zookeeper_properties: &jobs_zookeeper_properties
+  listen_address: ((zookeeper_listen_address))
+  client_port: ((zookeeper_client_port))
+  quorum_port: ((zookeeper_quorum_port))
+  leader_election_port: ((zookeeper_leader_election_port))
+  autopurge_purge_interval: ((zookeeper_autopurge_purge_interval))
+  autopurge_snap_retain_count: ((zookeeper_autopurge_snap_retain_count))
+  cnx_timeout: ((zookeeper_cnx_timeout))
+  election_algorim: ((zookeeper_election_algorim))
+  warning_threshold_ms: ((zookeeper_warning_threshold_ms))
+  global_outstanding_limit: ((zookeeper_global_outstanding_limit))
+  init_limit: ((zookeeper_init_limit))
+  leader_serves: ((zookeeper_leader_serves))
+  max_client_connections: ((zookeeper_max_client_connections))
+  max_session_timeout: ((zookeeper_max_session_timeout))
+  min_session_timeout: ((zookeeper_min_session_timeout))
+  pre_allocation_size: ((zookeeper_pre_allocation_size))
+  snap_count: ((zookeeper_snap_count))
+  sync_enabled: ((zookeeper_sync_enabled))
+  sync_limit: ((zookeeper_sync_limit))
+  tick_time: ((zookeeper_tick_time))
+  force_sync: ((zookeeper_force_sync))
+
+jobs_kafka_properties: &jobs_kafka_properties
+  listen_port: ((kafka_listen_port))
+  starting_index: ((kafka_starting_index))
+  index_spacing: ((kafka_index_spacing))
+  rack_id: ((kafka_rack_id))
+  jmx_port: ((kafka_jmx_port))
+  heap_size: ((kafka_heap_size))
+  topics: ((kafka_topics))
+  delete_topic: ((kafka_delete_topic))
+  keystore_password: ((kafka_keystore_password))
+  enable_sasl_scram: ((kafka_enable_sasl_scram))
+  offsets:
+      topic:
+          replication:
+              factor: ((kafka_topic_replication_factor))
+  auto:
+      create:
+          topics:
+              enable: ((kafka_enable_topics))
+  transaction:
+      state:
+          log:
+              replication:
+                  factor: ((kafka_log_replication_factor))
+              min:
+                  isr: ((kafka_log_min_isr))
+  advertised:
+      listener: ((kafka_advertised_listener))
+  tls:
+      ca_certs: ((kafka_tls_ca_certs))
+      certificate: ((kafka_tls_certificate))
+  jaas_admin:
+      username: ((kafka_jaas_admin_username))
+      password: ((kafka_jaas_admin_password))
+
+jobs_cmak_properties: &jobs_cmak_properties
+  listen_port: ((cmak_listen_port))
+  name: ((cmak_name))
+  username: ((cmak_username))
+  password: ((cmak_password))
+
+name: ((deployment_name))
+
+addons:
+- name: bpm
+  jobs:
+  - name: bpm
+    release: bpm
+
+instance_groups:
+- name: zookeeper
+  azs: [z1, z2, z3]
+  instances: ((zookeeper_instances))
+  jobs:
+  - name: zookeeper
+    release: zookeeper
+    properties:
+      <<: *jobs_zookeeper_properties
+  - name: status
+    release: zookeeper
+  vm_type: ((zookeeper_vm_type))
+  stemcell: ((zookeeper_stemcell))
+  persistent_disk: ((zookeeper_persistent_disk))
+  networks: [{name: ((zookeeper_network))}]
+- name: smoke-tests
+  lifecycle: errand
+  azs: [z1, z2, z3]
+  instances: 1
+  vm_type: ((smoke_tests_vm_type))
+  stemcell: ((smoke_tests_stemcell))
+  networks: [{name: ((smoke_tests_network))}]
+  jobs:
+  - name: smoke-tests
+    release: zookeeper
+- name: kafka
+  azs: [z1, z2, z3]
+  instances: ((kafka_instances))
+  vm_type: ((kafka_vm_type))
+  stemcell: ((kafka_stemcell))
+  persistent_disk: ((kafka_persistent_disk))
+  networks: [{name: ((kafka_network))}]
+  jobs:
+  - name: kafka
+    release: kafka
+    properties:
+      <<: *jobs_kafka_properties
+- name: sanitytest
+  lifecycle: errand
+  azs: [z1, z2, z3]
+  instances: 1
+  vm_type: ((sanitytest_vm_type))
+  stemcell: ((sanitytest_stemcell))
+  networks: [{name: ((sanitytest_network))}]
+  jobs:
+  - name: sanitytest
+    release: kafka
+- name: generatetopics
+  lifecycle: errand
+  azs: [z1, z2, z3]
+  instances: 1
+  vm_type: ((generatetopics_vm_type))
+  stemcell: ((generatetopics_stemcell))
+  jobs:
+  - name: generatetopics
+    release: kafka
+- name: cmak
+  azs: [z1, z2, z3]
+  instances: ((cmak_instances))
+  jobs:
+  - name: cmak
+    release: cmak
+    properties:
+      <<: *jobs_cmak_properties
+  vm_type: ((cmak_vm_type))
+  stemcell: ((cmak_stemcell))
+  persistent_disk: ((cmak_persistent_disk))
+  networks: [{name: ((cmak_network))}]
+
+releases:
+- name: bpm
+  sha1: ((bpm_sha1))
+  stemcell: ((bpm_stemcell))
+    os: ((bpm_stemcell_os))
+    version: ((bpm_stemcell_version))
+  url: ((bpm_url))
+  version: ((bpm_version))
+- name: zookeeper
+  sha1: ((zookeeper_sha1))
+  stemcell: ((zookeeper_stemcell))
+    os: ((zookeeper_stemcell_os))
+    version: ((zookeeper_stemcell_version))
+  url: ((zookeeper_url))
+  version: ((zookeeper_version))
+- name: kafka
+  sha1: ((kafka_sha1))
+  stemcell: ((kafka_stemcell))
+    os: ((kafka_stemcell_os))
+    version: ((kafka_stemcell_version))
+  url: ((kafka_url))
+  version: ((kafka_version))
+- name: cmak
+  sha1: ((cmak_sha1))
+  stemcell: ((cmak_stemcell))
+    os: ((cmak_stemcell_os))
+    version: ((cmak_stemcell_version))
+  url: ((cmak_url))
+  version: ((cmak_version))
+
+stemcells:
+- alias: default
+  os: ubuntu-xenial
+  version: 456.latest
+
+update:
+  canaries: 1
+  canary_watch_time: 1000-60000
+  update_watch_time: 1000-60000
+  max_in_flight: 1
+  serial: true
