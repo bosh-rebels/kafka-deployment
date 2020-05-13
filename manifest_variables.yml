@@ -1,37 +1,24 @@
-bpm_sha1:
-bpm_stemcell:
-bpm_url:
-bpm_version:
-cmak_instances:
-cmak_network:
-cmak_persistent_disk:
-cmak_sha1:
-cmak_stemcell:
-cmak_url:
-cmak_version:
-cmak_vm_type:
-deployment_name:
-generatetopics_stemcell:
-generatetopics_vm_type:
-kafka_instances:
-kafka_network:
-kafka_persistent_disk:
-kafka_sha1:
-kafka_stemcell:
-kafka_url:
-kafka_version:
-kafka_vm_type:
-sanitytest_network:
-sanitytest_stemcell:
-sanitytest_vm_type:
-smoke_tests_network:
-smoke_tests_stemcell:
-smoke_tests_vm_type:
-zookeeper_instances:
-zookeeper_network:
-zookeeper_persistent_disk:
-zookeeper_sha1:
-zookeeper_stemcell:
-zookeeper_url:
-zookeeper_version:
-zookeeper_vm_type:
+cmak_instances: 1
+cmak_network: default
+cmak_persistent_disk: 10GB
+cmak_vm_type: small
+deployment_name: kafka
+generatetopics_vm_type: small
+kafka_instances: 3
+kafka_network: default
+kafka_persistent_disk: 10GB
+kafka_vm_type: small
+sanitytest_network: default
+sanitytest_vm_type: small
+smoke_tests_network: default
+smoke_tests_vm_type: small
+zookeeper_instances: 3
+zookeeper_network: default
+zookeeper_persistent_disk: 10GB
+zookeeper_vm_type: small
+zookeeper_stemcell: default
+smoke_tests_stemcell: default
+kafka_stemcell: default
+sanitytest_stemcell: default
+generatetopics_stemcell: default
+cmak_stemcell: default
