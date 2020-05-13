@@ -143,30 +143,18 @@ instance_groups:
 releases:
 - name: bpm
   sha1: ((bpm_sha1))
-  stemcell: ((bpm_stemcell))
-    os: ((bpm_stemcell_os))
-    version: ((bpm_stemcell_version))
   url: ((bpm_url))
   version: ((bpm_version))
 - name: zookeeper
   sha1: ((zookeeper_sha1))
-  stemcell: ((zookeeper_stemcell))
-    os: ((zookeeper_stemcell_os))
-    version: ((zookeeper_stemcell_version))
   url: ((zookeeper_url))
   version: ((zookeeper_version))
 - name: kafka
   sha1: ((kafka_sha1))
-  stemcell: ((kafka_stemcell))
-    os: ((kafka_stemcell_os))
-    version: ((kafka_stemcell_version))
   url: ((kafka_url))
   version: ((kafka_version))
 - name: cmak
   sha1: ((cmak_sha1))
-  stemcell: ((cmak_stemcell))
-    os: ((cmak_stemcell_os))
-    version: ((cmak_stemcell_version))
   url: ((cmak_url))
   version: ((cmak_version))
 
