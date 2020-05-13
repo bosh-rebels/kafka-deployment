@@ -36,7 +36,7 @@ jobs_kafka_properties: &jobs_kafka_properties
   offsets:
       topic:
           replication:
-              factor: ((kafka_topic_replication_factor))
+              factor: ((kafka_offsets_topic_replication_factor))
   auto:
       create:
           topics:
@@ -45,9 +45,9 @@ jobs_kafka_properties: &jobs_kafka_properties
       state:
           log:
               replication:
-                  factor: ((kafka_log_replication_factor))
+                  factor: ((kafka_transaction_state_log_replication_factor))
               min:
-                  isr: ((kafka_log_min_isr))
+                  isr: ((kafka_transaction_state_log_min_isr))
   advertised:
       listener: ((kafka_advertised_listener))
   tls:
