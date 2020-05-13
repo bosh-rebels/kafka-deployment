@@ -51,8 +51,8 @@ jobs_kafka_properties: &jobs_kafka_properties
   advertised:
       listener: ((kafka_advertised_listener))
   tls:
-      ca_certs: ((kafka_tls_ca_certs))
-      certificate: ((kafka_tls_certificate))
+      ca_certs: [((kafka_tls_certificate.ca))]
+      certificate: ((kafka_tls_certificate.certificate))
   jaas_admin:
       username: ((kafka_jaas_admin_username))
       password: ((kafka_jaas_admin_password))
@@ -62,8 +62,6 @@ jobs_cmak_properties: &jobs_cmak_properties
   name: ((cmak_name))
   username: ((cmak_username))
   password: ((cmak_password))
-
-name: ((deployment_name))
 
 addons:
 - name: bpm
@@ -106,6 +104,12 @@ instance_groups:
   jobs:
   - name: kafka
     release: kafka
+    provides:
+      kafka-address:
+        as: the-kafka-address
+    custom_provider_definitions:
+    - name: kafka-address  
+      type: address
     properties:
       <<: *jobs_kafka_properties
 - name: sanitytest
@@ -140,28 +144,26 @@ instance_groups:
   persistent_disk: ((cmak_persistent_disk))
   networks: [{name: ((cmak_network))}]
 
+name: ((deployment_name))
+
 releases:
 - name: bpm
   sha1: ((bpm_sha1))
-  url: ((bpm_url))
   version: ((bpm_version))
 - name: zookeeper
   sha1: ((zookeeper_sha1))
-  url: ((zookeeper_url))
   version: ((zookeeper_version))
 - name: kafka
   sha1: ((kafka_sha1))
-  url: ((kafka_url))
   version: ((kafka_version))
 - name: cmak
   sha1: ((cmak_sha1))
-  url: ((cmak_url))
   version: ((cmak_version))
 
 stemcells:
 - alias: default
-  os: ubuntu-xenial
-  version: 456.latest
+  os: ((kafka_deployment_stemcell_os))
+  version: ((kafka_deployment_stemcell_version))
 
 update:
   canaries: 1
@@ -169,3 +171,19 @@ update:
   update_watch_time: 1000-60000
   max_in_flight: 1
   serial: true
+
+variables:
+- name: cmak_password
+  type: password
+- name: kafka_ca
+  type: certificate
+  options:
+    is_ca: true
+    common_name: ((deployment_name))
+- name: kafka_tls_certificate
+  type: certificate
+  options:
+    ca: kafka_ca
+    common_name: ((deployment_name))_server
+  consumes:
+    alternative_name: the-kafka-address

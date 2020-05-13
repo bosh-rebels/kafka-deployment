@@ -1,0 +1,143 @@
+resource_types:
+- name: bosh-deployment
+  type: docker-image
+  source:
+    repository: cloudfoundry/bosh-deployment-resource
+
+resources:
+- name: kafka-deployment
+  type: git
+  source:
+    uri: https://github.com/bosh-rebels/kafka-deployment
+    branch: master
+    
+- name: ubuntu-xenial
+  type: bosh-io-stemcell
+  source:
+    name: bosh-aws-xen-hvm-ubuntu-xenial-go_agent
+    version_family: ((stemcell_version))
+
+- name: deploy-release
+  type: bosh-deployment
+  source:
+    deployment: kafka
+    target: ((bosh_target))
+    client: ((bosh_client))
+    client_secret: ((bosh_client_secret))
+    ca_cert: ((bosh_ca_cert))
+
+- name: kafka-compiled-release
+  type: s3
+  source:
+    region_name: ((s3_region))
+    bucket: binary-releases-repo-rebels
+    regexp: kafka/kafka-(.*)-ubuntu-xenial-((stemcell_version))-*.tgz
+    access_key_id: ((s3_access_key_id))
+    secret_access_key: ((s3_secret_access_key))
+
+- name: zookeeper-compiled-release
+  type: s3
+  source:
+    region_name: ((s3_region))
+    bucket: binary-releases-repo-rebels
+    regexp: zookeeper/zookeeper-(.*)-ubuntu-xenial-((stemcell_version))-*.tgz
+    access_key_id: ((s3_access_key_id))
+    secret_access_key: ((s3_secret_access_key))
+
+- name: cmak-compiled-release
+  type: s3
+  source:
+    region_name: ((s3_region))
+    bucket: binary-releases-repo-rebels
+    regexp: cmak/cmak-(.*)-ubuntu-xenial-((stemcell_version))-*.tgz
+    access_key_id: ((s3_access_key_id))
+    secret_access_key: ((s3_secret_access_key))
+
+- name: bpm-bosh-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry/bpm-release
+
+jobs:
+- name: deploy-kafka
+  plan:
+  - get: kafka-deployment
+  - get: kafka-compiled-release
+  - get: zookeeper-compiled-release
+  - get: cmak-compiled-release
+  - get: bpm-bosh-release
+  - get: ubuntu-xenial
+  - task: calculate-sha1-for-kafka
+    file: elasticsearch-deployment/ci/tasks/calculate-sha1/task.yml
+    input_mapping:
+      tarball: kafka-compiled-release
+    output_mapping:
+      sha: kafka-sha1
+  - task: calculate-sha1-for-zookeeper
+    file: elasticsearch-deployment/ci/tasks/calculate-sha1/task.yml
+    input_mapping:
+      tarball: zookeeper-compiled-release
+    output_mapping:
+      sha: zookeeper-sha1
+  - task: calculate-sha1-for-cmak
+    file: elasticsearch-deployment/ci/tasks/calculate-sha1/task.yml
+    input_mapping:
+      tarball: cmak-compiled-release
+    output_mapping:
+      sha: cmak-sha
+  - load_vars: kafka_version
+    file: kafka-compiled-release/version
+  - load_vars: kafka_sha1
+    file: kafka-sha1/sha1
+  - load_vars: zookeeper_version
+    file: zookeeper-compiled-release/version
+  - load_vars: zookeeper_sha1
+    file: zookeeper-sha1/sha1
+  - load_vars: cmak_version
+    file: cmak-compiled-release/version
+  - load_vars: cmak_sha1
+    file: cmak-sha1/sha1
+  - load_vars: bpm_url
+    file: bpm-bosh-release/url
+  - load_vars: bpm_version
+    file: bpm-bosh-release/version
+  - load_vars: bpm_sha1
+    file: bpm-bosh-release/sha1
+  - put: deploy-release
+    params:
+      manifest: kafka-deployment/manifest.yml
+      stemcells:
+      - ubuntu-xenial/*.tgz
+      releases:
+      - kafka-compiled-release/*.tgz
+      - zookeeper-compiled-release/*.tgz
+      - cmak-compiled-release/*.tgz
+      - bpm-bosh-release/*.tgz
+      vars:
+        cmak_instances: 1
+        cmak_network: default
+        cmak_persistent_disk: 10GB
+        cmak_stemcell: default
+        cmak_vm_type: default
+        deployment_name: kafka
+        generatetopics_stemcell: default
+        generatetopics_vm_type: default
+        kafka_deployment_stemcell_os: ubuntu-xenial
+        kafka_deployment_stemcell_version: ((stemcell_version))
+        kafka_enable_topics: false
+        kafka_instances: 3
+        kafka_network: default
+        kafka_persistent_disk: 10GB
+        kafka_stemcell: default
+        kafka_vm_type: default
+        sanitytest_network: default
+        sanitytest_stemcell: default
+        sanitytest_vm_type: default
+        smoke_tests_network: default
+        smoke_tests_stemcell: default
+        smoke_tests_vm_type: default
+        zookeeper_instances: 3
+        zookeeper_network: default
+        zookeeper_persistent_disk: 10GB
+        zookeeper_stemcell: default
+        zookeeper_vm_type: default

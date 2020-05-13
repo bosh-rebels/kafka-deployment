@@ -1,0 +1,20 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: paymentshubrebels/bosh-utils
+    tag: 'latest'
+
+inputs:
+  - name: tarball
+outputs:
+  - name: sha
+
+run:
+  path: /bin/bash
+  args:
+    - -ec
+    - |
+      sha1sum tarball/*.tgz | awk '{print $1}' > sha/sha1
