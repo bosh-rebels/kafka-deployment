@@ -85,23 +85,23 @@ jobs:
       tarball: cmak-compiled-release
     output_mapping:
       sha: cmak-sha
-  - load_vars: kafka_version
+  - load_var: kafka_version
     file: kafka-compiled-release/version
-  - load_vars: kafka_sha1
+  - load_var: kafka_sha1
     file: kafka-sha1/sha1
-  - load_vars: zookeeper_version
+  - load_var: zookeeper_version
     file: zookeeper-compiled-release/version
-  - load_vars: zookeeper_sha1
+  - load_var: zookeeper_sha1
     file: zookeeper-sha1/sha1
-  - load_vars: cmak_version
+  - load_var: cmak_version
     file: cmak-compiled-release/version
-  - load_vars: cmak_sha1
+  - load_var: cmak_sha1
     file: cmak-sha1/sha1
-  - load_vars: bpm_url
+  - load_var: bpm_url
     file: bpm-bosh-release/url
-  - load_vars: bpm_version
+  - load_var: bpm_version
     file: bpm-bosh-release/version
-  - load_vars: bpm_sha1
+  - load_var: bpm_sha1
     file: bpm-bosh-release/sha1
   - put: deploy-release
     params:
