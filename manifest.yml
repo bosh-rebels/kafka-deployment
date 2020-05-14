@@ -52,7 +52,7 @@ jobs_kafka_properties: &jobs_kafka_properties
       listener: ((kafka_advertised_listener))
   tls:
       ca_certs: [((kafka_ca.certificate))]
-      certificate: ((kafka_tls_certificate.certificate))
+      certificate: ((kafka_tls_certificate))
   jaas_admin:
       username: ((kafka_jaas_admin_username))
       password: ((kafka_jaas_admin_password))
