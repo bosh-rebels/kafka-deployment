@@ -51,7 +51,7 @@ jobs_kafka_properties: &jobs_kafka_properties
   advertised:
       listener: ((kafka_advertised_listener))
   tls:
-      ca_certs: [((kafka_tls_certificate.ca))]
+      ca_certs: [((kafka_ca.certificate))]
       certificate: ((kafka_tls_certificate.certificate))
   jaas_admin:
       username: ((kafka_jaas_admin_username))
@@ -108,7 +108,7 @@ instance_groups:
       kafka-address:
         as: the-kafka-address
     custom_provider_definitions:
-    - name: kafka-address  
+    - name: kafka-address
       type: address
     properties:
       <<: *jobs_kafka_properties
