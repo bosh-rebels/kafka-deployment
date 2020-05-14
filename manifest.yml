@@ -17,7 +17,7 @@ instance_groups:
     release: zookeeper
   vm_type: ((zookeeper_vm_type))
   stemcell: ((zookeeper_stemcell))
-  persistent_disk: ((zookeeper_persistent_disk))
+  persistent_disk_type: ((zookeeper_persistent_disk_type))
   networks: [{name: ((zookeeper_network))}]
 - name: smoke-tests
   lifecycle: errand
@@ -34,7 +34,7 @@ instance_groups:
   instances: ((kafka_instances))
   vm_type: ((kafka_vm_type))
   stemcell: ((kafka_stemcell))
-  persistent_disk: ((kafka_persistent_disk))
+  persistent_disk_type: ((kafka_persistent_disk_type))
   networks: [{name: ((kafka_network))}]
   jobs:
   - name: kafka
@@ -74,7 +74,7 @@ instance_groups:
     properties: {}
   vm_type: ((cmak_vm_type))
   stemcell: ((cmak_stemcell))
-  persistent_disk: ((cmak_persistent_disk))
+  persistent_disk_type: ((cmak_persistent_disk_type))
   networks: [{name: ((cmak_network))}]
 
 name: ((deployment_name))
