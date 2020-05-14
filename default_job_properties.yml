@@ -1,12 +1,8 @@
 cmak_listen_port: 8080
 cmak_name: BOSH
-cmak_password: ((cmak_password))
 cmak_username: admin
-kafka_advertised_listener: ((kafka_advertised_listener))
 kafka_delete_topic: false
 kafka_enable_sasl_scram: false
-kafka_enable_topics: ((kafka_enable_topics))
-kafka_heap_size: ((kafka_heap_size))
 kafka_index_spacing: 1
 kafka_jaas_admin_password: "admin-secret"
 kafka_jaas_admin_username: "admin"
@@ -18,7 +14,6 @@ kafka_transaction_state_log_replication_factor: 3
 kafka_rack_id: "RACK1"
 kafka_starting_index: 1
 kafka_tls_ca_certs: []
-kafka_tls_certificate: ((kafka_tls_certificate))
 kafka_offsets_topic_replication_factor: 3
 kafka_topics: []
 zookeeper_autopurge_purge_interval: 24
@@ -41,4 +36,4 @@ zookeeper_snap_count: 100000
 zookeeper_sync_enabled: true
 zookeeper_sync_limit: 2
 zookeeper_tick_time: 2000
-zookeeper_warning_threshold_ms: 1000 
+zookeeper_warning_threshold_ms: 1000
