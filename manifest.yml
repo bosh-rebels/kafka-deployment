@@ -51,8 +51,8 @@ jobs_kafka_properties: &jobs_kafka_properties
   advertised:
       listener: ((kafka_advertised_listener))
   tls:
-      ca_certs: [((concourse/main/kafka-deployment/kafka_ca.certificate))]
-      certificate: ((concourse/main/kafka-deployment/kafka_tls_certificate))
+      ca_certs: [((/concourse/main/kafka-deployment/kafka_ca.certificate))]
+      certificate: ((/concourse/main/kafka-deployment/kafka_tls_certificate))
   jaas_admin:
       username: ((kafka_jaas_admin_username))
       password: ((kafka_jaas_admin_password))
@@ -61,7 +61,7 @@ jobs_cmak_properties: &jobs_cmak_properties
   listen_port: ((cmak_listen_port))
   name: ((cmak_name))
   username: ((cmak_username))
-  password: ((concourse/main/kafka-deployment/cmak_password))
+  password: ((/concourse/main/kafka-deployment/cmak_password))
 
 addons:
 - name: bpm
@@ -173,14 +173,14 @@ update:
   serial: true
 
 variables:
-- name: concourse/main/kafka-deployment/cmak_password
+- name: /concourse/main/kafka-deployment/cmak_password
   type: password
-- name: concourse/main/kafka-deployment/kafka_ca
+- name: /concourse/main/kafka-deployment/kafka_ca
   type: certificate
   options:
     is_ca: true
     common_name: ((deployment_name))
-- name: concourse/main/kafka-deployment/kafka_tls_certificate
+- name: /concourse/main/kafka-deployment/kafka_tls_certificate
   type: certificate
   options:
     ca: kafka_ca
