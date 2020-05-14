@@ -72,7 +72,8 @@ instance_groups:
   jobs:
   - name: cmak
     release: cmak
-    properties: {}
+    properties:
+      password: ((cmak_password))
   vm_type: ((cmak_vm_type))
   stemcell: ((cmak_stemcell))
   persistent_disk_type: ((cmak_persistent_disk_type))
