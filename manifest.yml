@@ -62,6 +62,7 @@ instance_groups:
   instances: 1
   vm_type: ((generatetopics_vm_type))
   stemcell: ((generatetopics_stemcell))
+  networks: [{name: ((generatetopics_network))}]
   jobs:
   - name: generatetopics
     release: kafka
