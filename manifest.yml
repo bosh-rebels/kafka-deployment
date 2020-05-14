@@ -1,68 +1,4 @@
 ---
-jobs_zookeeper_properties: &jobs_zookeeper_properties
-  listen_address: ((zookeeper_listen_address))
-  client_port: ((zookeeper_client_port))
-  quorum_port: ((zookeeper_quorum_port))
-  leader_election_port: ((zookeeper_leader_election_port))
-  autopurge_purge_interval: ((zookeeper_autopurge_purge_interval))
-  autopurge_snap_retain_count: ((zookeeper_autopurge_snap_retain_count))
-  cnx_timeout: ((zookeeper_cnx_timeout))
-  election_algorim: ((zookeeper_election_algorim))
-  warning_threshold_ms: ((zookeeper_warning_threshold_ms))
-  global_outstanding_limit: ((zookeeper_global_outstanding_limit))
-  init_limit: ((zookeeper_init_limit))
-  leader_serves: ((zookeeper_leader_serves))
-  max_client_connections: ((zookeeper_max_client_connections))
-  max_session_timeout: ((zookeeper_max_session_timeout))
-  min_session_timeout: ((zookeeper_min_session_timeout))
-  pre_allocation_size: ((zookeeper_pre_allocation_size))
-  snap_count: ((zookeeper_snap_count))
-  sync_enabled: ((zookeeper_sync_enabled))
-  sync_limit: ((zookeeper_sync_limit))
-  tick_time: ((zookeeper_tick_time))
-  force_sync: ((zookeeper_force_sync))
-
-jobs_kafka_properties: &jobs_kafka_properties
-  listen_port: ((kafka_listen_port))
-  starting_index: ((kafka_starting_index))
-  index_spacing: ((kafka_index_spacing))
-  rack_id: ((kafka_rack_id))
-  jmx_port: ((kafka_jmx_port))
-  heap_size: ((kafka_heap_size))
-  topics: ((kafka_topics))
-  delete_topic: ((kafka_delete_topic))
-  keystore_password: ((kafka_keystore_password))
-  enable_sasl_scram: ((kafka_enable_sasl_scram))
-  offsets:
-      topic:
-          replication:
-              factor: ((kafka_offsets_topic_replication_factor))
-  auto:
-      create:
-          topics:
-              enable: ((kafka_enable_topics))
-  transaction:
-      state:
-          log:
-              replication:
-                  factor: ((kafka_transaction_state_log_replication_factor))
-              min:
-                  isr: ((kafka_transaction_state_log_min_isr))
-  advertised:
-      listener: ((kafka_advertised_listener))
-  tls:
-      ca_certs: [((/concourse/main/kafka-deployment/kafka_ca.certificate))]
-      certificate: ((/concourse/main/kafka-deployment/kafka_tls_certificate))
-  jaas_admin:
-      username: ((kafka_jaas_admin_username))
-      password: ((kafka_jaas_admin_password))
-
-jobs_cmak_properties: &jobs_cmak_properties
-  listen_port: ((cmak_listen_port))
-  name: ((cmak_name))
-  username: ((cmak_username))
-  password: ((/concourse/main/kafka-deployment/cmak_password))
-
 addons:
 - name: bpm
   jobs:
@@ -76,8 +12,7 @@ instance_groups:
   jobs:
   - name: zookeeper
     release: zookeeper
-    properties:
-      <<: *jobs_zookeeper_properties
+    properties: {}
   - name: status
     release: zookeeper
   vm_type: ((zookeeper_vm_type))
@@ -104,14 +39,13 @@ instance_groups:
   jobs:
   - name: kafka
     release: kafka
-    provides:
-      kafka-address:
-        as: the-kafka-address
-    custom_provider_definitions:
-    - name: kafka-address
-      type: address
-    properties:
-      <<: *jobs_kafka_properties
+    # provides:
+    #   kafka-address:
+    #     as: the-kafka-address
+    # custom_provider_definitions:
+    # - name: kafka-address
+    #   type: address
+    properties: {}
 - name: sanitytest
   lifecycle: errand
   azs: [z1, z2, z3]
@@ -137,8 +71,7 @@ instance_groups:
   jobs:
   - name: cmak
     release: cmak
-    properties:
-      <<: *jobs_cmak_properties
+    properties: {}
   vm_type: ((cmak_vm_type))
   stemcell: ((cmak_stemcell))
   persistent_disk: ((cmak_persistent_disk))
@@ -173,17 +106,17 @@ update:
   serial: true
 
 variables:
-- name: /concourse/main/kafka-deployment/cmak_password
+- name: cmak_password
   type: password
-- name: /concourse/main/kafka-deployment/kafka_ca
-  type: certificate
-  options:
-    is_ca: true
-    common_name: ((deployment_name))
-- name: /concourse/main/kafka-deployment/kafka_tls_certificate
-  type: certificate
-  options:
-    ca: kafka_ca
-    common_name: ((deployment_name))_server
-  consumes:
-    alternative_name: the-kafka-address
+# - name: kafka_ca
+#   type: certificate
+#   options:
+#     is_ca: true
+#     common_name: ((deployment_name))
+# - name: kafka_tls_certificate
+#   type: certificate
+#   options:
+#     ca: kafka_ca
+#     common_name: ((deployment_name))_server
+#   consumes:
+#     alternative_name: the-kafka-address
