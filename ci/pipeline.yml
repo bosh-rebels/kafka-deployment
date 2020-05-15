@@ -147,3 +147,9 @@ jobs:
         zookeeper_sha1: ((.:zookeeper_sha1))
         zookeeper_stemcell: default
         zookeeper_vm_type: default
+        kafka_auto_create_topics_enable: true
+        kafka_delete_topic: true
+        kafka_offsets_topic_replication_factor: 2
+        kafka_transaction_state_log_min_isr: 1
+        kafka_topics: {}
+
