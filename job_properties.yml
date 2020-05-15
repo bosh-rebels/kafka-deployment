@@ -1,3 +1,0 @@
-kafka_advertised_listener: ((kafka_advertised_listener))
-kafka_enable_topics: ((kafka_enable_topics))
-kafka_heap_size: ((kafka_heap_size))
