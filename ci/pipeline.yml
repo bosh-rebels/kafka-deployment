@@ -10,7 +10,7 @@ resources:
   source:
     uri: https://github.com/bosh-rebels/kafka-deployment
     branch: master
-    
+
 - name: ubuntu-xenial
   type: bosh-io-stemcell
   source:
@@ -31,7 +31,7 @@ resources:
   source:
     region_name: ((s3_region))
     bucket: binary-releases-repo-rebels
-    regexp: kafka/kafka-(.*)-ubuntu-xenial-((stemcell_version))-*.tgz
+    regexp: kafka/kafka-(.*)-ubuntu-xenial-((stemcell_version))-.*.tgz
     access_key_id: ((s3_access_key_id))
     secret_access_key: ((s3_secret_access_key))
 
@@ -40,7 +40,7 @@ resources:
   source:
     region_name: ((s3_region))
     bucket: binary-releases-repo-rebels
-    regexp: zookeeper/zookeeper-(.*)-ubuntu-xenial-((stemcell_version))-*.tgz
+    regexp: zookeeper/zookeeper-(.*)-ubuntu-xenial-((stemcell_version))-.*.tgz
     access_key_id: ((s3_access_key_id))
     secret_access_key: ((s3_secret_access_key))
 
@@ -49,7 +49,7 @@ resources:
   source:
     region_name: ((s3_region))
     bucket: binary-releases-repo-rebels
-    regexp: cmak/cmak-(.*)-ubuntu-xenial-((stemcell_version))-*.tgz
+    regexp: cmak/cmak-(.*)-ubuntu-xenial-((stemcell_version))-.*.tgz
     access_key_id: ((s3_access_key_id))
     secret_access_key: ((s3_secret_access_key))
 
@@ -62,29 +62,30 @@ jobs:
 - name: deploy-kafka
   plan:
   - get: kafka-deployment
+    trigger: true
   - get: kafka-compiled-release
   - get: zookeeper-compiled-release
   - get: cmak-compiled-release
   - get: bpm-bosh-release
   - get: ubuntu-xenial
   - task: calculate-sha1-for-kafka
-    file: elasticsearch-deployment/ci/tasks/calculate-sha1/task.yml
+    file: kafka-deployment/ci/tasks/calculate-sha1/task.yml
     input_mapping:
       tarball: kafka-compiled-release
     output_mapping:
       sha: kafka-sha1
   - task: calculate-sha1-for-zookeeper
-    file: elasticsearch-deployment/ci/tasks/calculate-sha1/task.yml
+    file: kafka-deployment/ci/tasks/calculate-sha1/task.yml
     input_mapping:
       tarball: zookeeper-compiled-release
     output_mapping:
       sha: zookeeper-sha1
   - task: calculate-sha1-for-cmak
-    file: elasticsearch-deployment/ci/tasks/calculate-sha1/task.yml
+    file: kafka-deployment/ci/tasks/calculate-sha1/task.yml
     input_mapping:
       tarball: cmak-compiled-release
     output_mapping:
-      sha: cmak-sha
+      sha: cmak-sha1
   - load_var: kafka_version
     file: kafka-compiled-release/version
   - load_var: kafka_sha1
@@ -114,12 +115,15 @@ jobs:
       - cmak-compiled-release/*.tgz
       - bpm-bosh-release/*.tgz
       vars:
+        bpm_sha1: ((.:bpm_sha1))
         cmak_instances: 1
         cmak_network: default
-        cmak_persistent_disk: 10GB
+        cmak_persistent_disk_type: default
+        cmak_sha1: ((.:cmak_sha1))
         cmak_stemcell: default
         cmak_vm_type: default
         deployment_name: kafka
+        generatetopics_network: default
         generatetopics_stemcell: default
         generatetopics_vm_type: default
         kafka_deployment_stemcell_os: ubuntu-xenial
@@ -127,7 +131,8 @@ jobs:
         kafka_enable_topics: false
         kafka_instances: 3
         kafka_network: default
-        kafka_persistent_disk: 10GB
+        kafka_persistent_disk_type: default
+        kafka_sha1: ((.:kafka_sha1))
         kafka_stemcell: default
         kafka_vm_type: default
         sanitytest_network: default
@@ -138,6 +143,7 @@ jobs:
         smoke_tests_vm_type: default
         zookeeper_instances: 3
         zookeeper_network: default
-        zookeeper_persistent_disk: 10GB
+        zookeeper_persistent_disk_type: default
+        zookeeper_sha1: ((.:zookeeper_sha1))
         zookeeper_stemcell: default
         zookeeper_vm_type: default
