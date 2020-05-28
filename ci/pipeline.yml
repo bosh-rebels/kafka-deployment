@@ -31,6 +31,17 @@ resources:
   source: 
     <<: *deploy-release-source
 
+- name: offline-release-version
+  type: semver
+  source:
+    driver: s3
+    region_name: ((s3_region))
+    initial_version: 0.0.1
+    bucket: bosh-releases-semver-rebels
+    key: deployments/kafka/version
+    access_key_id: ((s3_access_key_id))
+    secret_access_key: ((s3_secret_access_key))
+
 - name: kafka-compiled-release
   type: s3
   source:
@@ -58,10 +69,14 @@ resources:
     access_key_id: ((s3_access_key_id))
     secret_access_key: ((s3_secret_access_key))
 
-- name: bpm-bosh-release
-  type: bosh-io-release
+- name: bpm-compiled-release
+  type: s3
   source:
-    repository: cloudfoundry/bpm-release
+    region_name: ((s3_region))
+    bucket: binary-releases-repo-rebels
+    regexp: "bpm/bpm-(.*)-ubuntu-xenial-((stemcell_version))-.*.tgz"
+    access_key_id: ((s3_access_key_id))
+    secret_access_key: ((s3_secret_access_key))
 
 jobs:
 - name: deploy-kafka
@@ -71,8 +86,9 @@ jobs:
   - get: kafka-compiled-release
   - get: zookeeper-compiled-release
   - get: cmak-compiled-release
-  - get: bpm-bosh-release
+  - get: bpm-compiled-release
   - get: ubuntu-xenial
+  - get: offline-release-version
   - task: calculate-sha1-for-kafka
     file: kafka-deployment/ci/tasks/calculate-sha1/task.yml
     input_mapping:
@@ -85,6 +101,12 @@ jobs:
       tarball: zookeeper-compiled-release
     output_mapping:
       sha: zookeeper-sha1
+  - task: calculate-sha-for-bpm
+    file: kafka-deployment/ci/calculate-sha/task.yml
+    input_mapping:
+      tarball: bpm-compiled-release
+    output_mapping:
+      sha: bpm-sha
   - task: calculate-sha1-for-cmak
     file: kafka-deployment/ci/tasks/calculate-sha1/task.yml
     input_mapping:
@@ -103,12 +125,10 @@ jobs:
     file: cmak-compiled-release/version
   - load_var: cmak_sha1
     file: cmak-sha1/sha1
-  - load_var: bpm_url
-    file: bpm-bosh-release/url
   - load_var: bpm_version
-    file: bpm-bosh-release/version
+    file: bpm-compiled-release/version
   - load_var: bpm_sha1
-    file: bpm-bosh-release/sha1
+    file: bpm-sha/sha1
   - put: deploy-release
     params:
       manifest: kafka-deployment/manifest.yml
@@ -118,8 +138,9 @@ jobs:
       - kafka-compiled-release/*.tgz
       - zookeeper-compiled-release/*.tgz
       - cmak-compiled-release/*.tgz
-      - bpm-bosh-release/*.tgz
+      - bpm-compiled-release/*.tgz
       vars:
+        bpm_version: ((.:bpm_version)) 
         bpm_sha1: ((.:bpm_sha1))
         cmak_instances: 1
         cmak_network: default
@@ -157,6 +178,19 @@ jobs:
         kafka_offsets_topic_replication_factor: 2
         kafka_transaction_state_log_min_isr: 1
         kafka_topics: {}
+    on_success:
+      do:
+        - task: create-offline-release
+          file: kafka-deployment/ci/create-offline-release/task.yml
+          params:
+            deployment_name: kafka
+            BOSH_ENVIRONMENT: ((bosh_target))
+            BOSH_CA_CERT: ((bosh_ca_cert))
+            BOSH_CLIENT: ((bosh_client))
+            BOSH_CLIENT_SECRET: ((bosh_client_secret))
+        
+        - put: offline-release-version
+          params: {bump: patch}
 
 - name: delete-kafka-deployment
   plan:

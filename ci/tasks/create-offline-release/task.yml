@@ -1,0 +1,65 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: paymentshubrebels/bosh-utils
+    tag: 'latest'
+
+inputs:
+- name: kafka-compiled-release
+- name: zookeeper-compiled-release
+- name: cmak-compiled-release
+- name: bpm-compiled-release
+- name: ubuntu-xenial
+- name: offline-release-version
+- name: kafka-deployment
+- name: kafka-sha
+- name: zookeeper-sha
+- name: cmak-sha
+- name: bpm-sha
+
+params:
+  deployment_name:
+  BOSH_ENVIRONMENT:
+  BOSH_CA_CERT:
+  BOSH_CLIENT:
+  BOSH_CLIENT_SECRET:
+run:
+  path: /bin/bash
+  args:
+  - -ec
+  - |
+    export AWS_DEFAULT_REGION=((s3_region))
+    export AWS_ACCESS_KEY_ID=((s3_access_key_id))
+    export AWS_SECRET_ACCESS_KEY=((s3_secret_access_key))
+    apt-get update && apt-get install -y python3-pip && pip3 install awscli
+    export PATH=$PATH:/usr/local/bin
+    export version="$(cat offline-release-version/version)"
+    export offline_tarball="${deployment_name}-${version}.tgz"
+
+    release_names="$(ruby kafka-deployment/ci/create-offline-release/get-all-release-names.rb)"
+    
+    mkdir -p offline-release 
+    pushd offline-release
+      mkdir -p releases stemcell vars_file
+      touch vars_file/vars.yml
+      
+      cp ../ubuntu-xenial/*.tgz stemcell/
+      cp ../kafka-deployment/manifest.yml .
+      
+      for release in $release_names; do
+        sha1="$(cat ../${release}-sha/sha1)"
+        echo "${release}_sha1: ${sha1}" >> vars_file/vars.yml
+      done 
+
+      for release in $release_names; do
+        cp ../${release}-compiled-release/*.tgz releases/
+      done
+      
+      tar -cvf ${offline_tarball} *
+
+      aws s3 cp ${offline_tarball} s3://binary-releases-repo-rebels/deployments/${deployment_name}/
+      rm -rf releases stemcell
+    popd
