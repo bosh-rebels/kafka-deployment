@@ -15,10 +15,10 @@ inputs:
 - name: ubuntu-xenial
 - name: offline-release-version
 - name: kafka-deployment
-- name: kafka-sha
-- name: zookeeper-sha
-- name: cmak-sha
-- name: bpm-sha
+- name: kafka-sha1
+- name: zookeeper-sha1
+- name: cmak-sha1
+- name: bpm-sha1
 
 params:
   deployment_name:
@@ -50,7 +50,7 @@ run:
       cp ../kafka-deployment/manifest.yml .
       
       for release in $release_names; do
-        sha1="$(cat ../${release}-sha/sha1)"
+        sha1="$(cat ../${release}-sha1/sha1)"
         echo "${release}_sha1: ${sha1}" >> vars_file/vars.yml
       done 
 

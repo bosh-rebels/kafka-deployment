@@ -101,8 +101,8 @@ jobs:
       tarball: zookeeper-compiled-release
     output_mapping:
       sha: zookeeper-sha1
-  - task: calculate-sha-for-bpm
-    file: kafka-deployment/ci/calculate-sha/task.yml
+  - task: calculate-sha1-for-bpm
+    file: kafka-deployment/ci/tasks/calculate-sha1/task.yml
     input_mapping:
       tarball: bpm-compiled-release
     output_mapping:
@@ -140,7 +140,6 @@ jobs:
       - cmak-compiled-release/*.tgz
       - bpm-compiled-release/*.tgz
       vars:
-        bpm_version: ((.:bpm_version)) 
         bpm_sha1: ((.:bpm_sha1))
         cmak_instances: 1
         cmak_network: default
@@ -181,7 +180,7 @@ jobs:
     on_success:
       do:
         - task: create-offline-release
-          file: kafka-deployment/ci/create-offline-release/task.yml
+          file: kafka-deployment/ci/tasks/create-offline-release/task.yml
           params:
             deployment_name: kafka
             BOSH_ENVIRONMENT: ((bosh_target))
