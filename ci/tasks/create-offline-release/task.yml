@@ -39,7 +39,7 @@ run:
     export version="$(cat offline-release-version/version)"
     export offline_tarball="${deployment_name}-${version}.tgz"
 
-    release_names="$(ruby kafka-deployment/ci/create-offline-release/get-all-release-names.rb)"
+    release_names="$(ruby kafka-deployment/ci/tasks/create-offline-release/get-all-release-names.rb)"
     
     mkdir -p offline-release 
     pushd offline-release

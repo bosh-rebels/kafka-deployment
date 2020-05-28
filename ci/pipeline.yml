@@ -106,7 +106,7 @@ jobs:
     input_mapping:
       tarball: bpm-compiled-release
     output_mapping:
-      sha: bpm-sha
+      sha: bpm-sha1
   - task: calculate-sha1-for-cmak
     file: kafka-deployment/ci/tasks/calculate-sha1/task.yml
     input_mapping:
@@ -128,7 +128,7 @@ jobs:
   - load_var: bpm_version
     file: bpm-compiled-release/version
   - load_var: bpm_sha1
-    file: bpm-sha/sha1
+    file: bpm-sha1/sha1
   - put: deploy-release
     params:
       manifest: kafka-deployment/manifest.yml
