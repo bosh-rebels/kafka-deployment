@@ -78,6 +78,15 @@ resources:
     access_key_id: ((s3_access_key_id))
     secret_access_key: ((s3_secret_access_key))
 
+- name: kafka-deployment-tarball
+  type: s3
+  source:
+    region_name: ((s3_region))
+    bucket: binary-releases-repo-rebels
+    regexp: "deployments/kafka/kafka-(.*).tgz"
+    access_key_id: ((s3_access_key_id))
+    secret_access_key: ((s3_secret_access_key))
+
 jobs:
 - name: deploy-kafka
   plan:
@@ -179,6 +188,8 @@ jobs:
         kafka_topics: {}
     on_success:
       do:
+        - get: kafka-deployment-tarball
+          params: { skip_download: true }
         - task: create-offline-release
           file: kafka-deployment/ci/tasks/create-offline-release/task.yml
           params:
