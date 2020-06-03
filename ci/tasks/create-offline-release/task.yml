@@ -19,7 +19,6 @@ inputs:
 - name: zookeeper-sha1
 - name: cmak-sha1
 - name: bpm-sha1
-- name: kafka-deployment-tarball
 
 params:
   deployment_name:
@@ -33,8 +32,6 @@ run:
   - -exc
   - |
     set -x
-    cat kafka-deployment-tarball
-    ls -lrt kafka-deployment-tarball
     export AWS_DEFAULT_REGION=((s3_region))
     export AWS_ACCESS_KEY_ID=((s3_access_key_id))
     export AWS_SECRET_ACCESS_KEY=((s3_secret_access_key))
