@@ -63,6 +63,6 @@ run:
 
       tarball_sha1=$(sha1sum ${offline_tarball} | awk '{print $1}')
 
-      aws s3 cp ${offline_tarball} s3://binary-releases-repo-rebels/deployments/${deployment_name}/ --metadata '{ "sha1":'"${tarball_sha1}"' }'
+      aws s3 cp ${offline_tarball} s3://binary-releases-repo-rebels/deployments/${deployment_name}/ --metadata "{ \"sha1\": \"${tarball_sha1}\" }"
       rm -rf releases stemcell
     popd
