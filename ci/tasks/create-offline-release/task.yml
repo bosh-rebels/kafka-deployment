@@ -69,14 +69,12 @@ run:
 
       running_version=$(cat ../running-version/version)
       
-      if [[ $(aws s3api head-object --bucket binary-releases-repo-rebels --key "deployments/${deployment_name}/${deployment_name}-${running_version}.tgz" 2>&1 | grep -c '404') != 0 ]];
-      then 
+      if [[ $(aws s3api head-object --bucket binary-releases-repo-rebels --key "deployments/${deployment_name}/${deployment_name}-${running_version}.tgz" 2>&1 | grep -c '404') != 0 ]]; then 
         cp bumped_version/version target/
         aws s3 cp ${offline_tarball} s3://binary-releases-repo-rebels/deployments/${deployment_name}/ --metadata "{ \"sha1\": \"${new_tarball_sha1}\" }"
       else
         aws s3api head-object --bucket binary-releases-repo-rebels --key "deployments/${deployment_name}/${deployment_name}-${running_version}.tgz" | jq -r ".Metadata.sha1" > current_tar_sha1
-        if [[ -z $(cat current_tar_sha1 | tr -d "[:blank:]") ]];
-        then
+        if [[ -z $(cat current_tar_sha1 | tr -d "[:blank:]") ]]; then
           if [[ "${new_tarball_sha1" != "$(cat current_tar_sha1)" ]]
             aws s3 cp ${offline_tarball} s3://binary-releases-repo-rebels/deployments/${deployment_name}/ --metadata "{ \"sha1\": \"${new_tarball_sha1}\" }"
             cp ../bumped_version/version target/
