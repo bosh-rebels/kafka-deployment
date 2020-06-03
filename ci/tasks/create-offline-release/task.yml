@@ -22,7 +22,7 @@ inputs:
 - name: bumped-version
 - name: running-version
 
-output:
+outputs:
   - name: target
 params:
   deployment_name:
