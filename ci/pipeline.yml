@@ -31,7 +31,18 @@ resources:
   source: 
     <<: *deploy-release-source
 
-- name: offline-release-version
+- name: running-version
+  type: semver
+  source:
+    driver: s3
+    region_name: ((s3_region))
+    initial_version: 0.0.1
+    bucket: bosh-releases-semver-rebels
+    key: deployments/kafka/version
+    access_key_id: ((s3_access_key_id))
+    secret_access_key: ((s3_secret_access_key))
+  
+- name: bumped-version
   type: semver
   source:
     driver: s3
@@ -78,7 +89,7 @@ resources:
     access_key_id: ((s3_access_key_id))
     secret_access_key: ((s3_secret_access_key))
 
-- name: kafka-deployment-tarball
+- name: kafka-deployment-current-tarball
   type: s3
   source:
     region_name: ((s3_region))
@@ -97,7 +108,9 @@ jobs:
   - get: cmak-compiled-release
   - get: bpm-compiled-release
   - get: ubuntu-xenial
-  - get: offline-release-version
+  - get: running-version
+  - get: bumped-version
+    params: {bump: patch}
   - task: calculate-sha1-for-kafka
     file: kafka-deployment/ci/tasks/calculate-sha1/task.yml
     input_mapping:
@@ -188,8 +201,8 @@ jobs:
         kafka_topics: {}
     on_success:
       do:
-        - get: kafka-deployment-tarball
-          params: { skip_download: true }
+        - get: kafka-deployment-current-tarball
+          params: { skip_download: "true"}
         - task: create-offline-release
           file: kafka-deployment/ci/tasks/create-offline-release/task.yml
           params:
@@ -199,8 +212,8 @@ jobs:
             BOSH_CLIENT: ((bosh_client))
             BOSH_CLIENT_SECRET: ((bosh_client_secret))
         
-        - put: offline-release-version
-          params: {bump: patch}
+        - put: running-version
+          params: {file: target/version}
 
 - name: delete-kafka-deployment
   plan:
