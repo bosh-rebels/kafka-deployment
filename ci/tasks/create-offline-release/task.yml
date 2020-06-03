@@ -13,7 +13,6 @@ inputs:
 - name: cmak-compiled-release
 - name: bpm-compiled-release
 - name: ubuntu-xenial
-- name: offline-release-version
 - name: kafka-deployment
 - name: kafka-sha1
 - name: zookeeper-sha1
