@@ -74,10 +74,12 @@ run:
         aws s3 cp ${offline_tarball} s3://binary-releases-repo-rebels/deployments/${deployment_name}/ --metadata "{ \"sha1\": \"${new_tarball_content_sha1}\" }"
       else
         aws s3api head-object --bucket binary-releases-repo-rebels --key "deployments/${deployment_name}/${deployment_name}-${running_version}.tgz" | jq -r ".Metadata.sha1" > current_tar_content_sha1
-        if [[ -z $(< current_tar_content_sha1 tr -d "[:blank:]") ]]; then
+       
+        echo "new_tarball_content_sha1 - ${new_tarball_content_sha1}"
+
+        if [[ ! -z $(< current_tar_content_sha1 tr -d "[:blank:]") ]]; then
           current_tar_content_sha1_value="$(cat current_tar_content_sha1)"
           echo "current_tar_content_sha1_value - ${current_tar_content_sha1_value}"
-          echo "new_tarball_content_sha1 - ${new_tarball_content_sha1}"
           if [[ "${new_tarball_content_sha1}" != "${current_tar_content_sha1_value}" ]]; then
             aws s3 cp ${offline_tarball} s3://binary-releases-repo-rebels/deployments/${deployment_name}/ --metadata "{ \"sha1\": \"${new_tarball_content_sha1}\" }"
             cp ../bumped-version/version ../target/
