@@ -53,6 +53,17 @@ resources:
     access_key_id: ((s3_access_key_id))
     secret_access_key: ((s3_secret_access_key))
 
+- name: target-version
+  type: semver
+  source:
+    driver: s3
+    region_name: ((s3_region))
+    initial_version: 0.0.1
+    bucket: bosh-releases-semver-rebels
+    key: deployments/kafka/target/version
+    access_key_id: ((s3_access_key_id))
+    secret_access_key: ((s3_secret_access_key))
+
 - name: kafka-compiled-release
   type: s3
   source:
@@ -97,6 +108,7 @@ resources:
     regexp: "deployments/kafka/kafka-(.*).tgz"
     access_key_id: ((s3_access_key_id))
     secret_access_key: ((s3_secret_access_key))
+    initial_path: "deployments/kafka/kafka-0.0.0.tgz"
 
 jobs:
 - name: deploy-kafka
@@ -213,6 +225,8 @@ jobs:
             BOSH_CLIENT_SECRET: ((bosh_client_secret))
         
         - put: running-version
+          params: {file: target/version}
+        - put: target-version
           params: {file: target/version}
 
 - name: delete-kafka-deployment
