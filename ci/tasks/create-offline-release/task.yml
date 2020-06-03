@@ -70,21 +70,21 @@ run:
       running_version=$(cat ../running-version/version)
       
       if [[ $(aws s3api head-object --bucket binary-releases-repo-rebels --key "deployments/${deployment_name}/${deployment_name}-${running_version}.tgz" 2>&1 | grep -c '404') != 0 ]]; then 
-        cp ../bumped-version/version target/
+        cp ../bumped-version/version ../target/
         aws s3 cp ${offline_tarball} s3://binary-releases-repo-rebels/deployments/${deployment_name}/ --metadata "{ \"sha1\": \"${new_tarball_sha1}\" }"
       else
         aws s3api head-object --bucket binary-releases-repo-rebels --key "deployments/${deployment_name}/${deployment_name}-${running_version}.tgz" | jq -r ".Metadata.sha1" > current_tar_sha1
         if [[ -z $(< current_tar_sha1 tr -d "[:blank:]") ]]; then
           if [[ "${new_tarball_sha1}" != "$(cat current_tar_sha1)" ]]; then
             aws s3 cp ${offline_tarball} s3://binary-releases-repo-rebels/deployments/${deployment_name}/ --metadata "{ \"sha1\": \"${new_tarball_sha1}\" }"
-            cp ../bumped-version/version target/
+            cp ../bumped-version/version ../target/
           else
             echo " No change in tarball, so not uploading tarball and not incrementing version."
-            cp ../running-version/version target/
+            cp ../running-version/version ../target/
           fi
         else
           aws s3 cp ${offline_tarball} s3://binary-releases-repo-rebels/deployments/${deployment_name}/ --metadata "{ \"sha1\": \"${new_tarball_sha1}\" }"
-          cp ../bumped-version/version target/
+          cp ../bumped-version/version ../target/
         fi
       fi
       rm -rf releases stemcell
