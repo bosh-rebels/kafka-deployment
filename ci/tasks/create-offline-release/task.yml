@@ -30,4 +30,4 @@ params:
   BOSH_CLIENT:
   BOSH_CLIENT_SECRET:
 run:
-  path: ./create_offline_release.sh
+  path: kafka-deployment/ci/tasks/create-offline-release/create_offline_release.sh
