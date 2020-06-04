@@ -31,3 +31,12 @@ params:
   BOSH_CLIENT_SECRET:
 run:
   path: kafka-deployment/ci/tasks/create-offline-release/create_offline_release.sh
+  args:
+    - -exc
+    - |
+      set -x
+      export AWS_DEFAULT_REGION=((s3_region))
+      export AWS_ACCESS_KEY_ID=((s3_access_key_id))
+      export AWS_SECRET_ACCESS_KEY=((s3_secret_access_key))
+      apt-get update && apt-get install -y python3-pip && pip3 install awscli
+      export PATH=$PATH:/usr/local/bin

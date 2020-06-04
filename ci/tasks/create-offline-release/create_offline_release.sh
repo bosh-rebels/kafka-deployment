@@ -1,12 +1,5 @@
 #!/bin/bash 
 
-set -x
-export AWS_DEFAULT_REGION=((s3_region))
-export AWS_ACCESS_KEY_ID=((s3_access_key_id))
-export AWS_SECRET_ACCESS_KEY=((s3_secret_access_key))
-apt-get update && apt-get install -y python3-pip && pip3 install awscli
-export PATH=$PATH:/usr/local/bin
-
 bumped_version="$(cat bumped-version/version)"
 export bumped_version
 offline_tarball="${deployment_name}-${bumped_version}.tgz"
