@@ -110,5 +110,3 @@ update:
 variables:
 - name: cmak_password
   type: password
-
-# just for testing
