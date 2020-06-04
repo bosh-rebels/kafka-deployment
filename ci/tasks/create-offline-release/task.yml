@@ -40,4 +40,4 @@ run:
       export AWS_SECRET_ACCESS_KEY=((s3_secret_access_key))
       export PATH=$PATH:/usr/local/bin
 
-      ./create_offline_release.sh
+      kafka-deployment/ci/tasks/create-offline-release/create_offline_release.sh
