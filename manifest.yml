@@ -12,7 +12,8 @@ instance_groups:
   jobs:
   - name: zookeeper
     release: zookeeper
-    properties: {}
+    properties:
+      data_log_dir: ((zookeeper_data_log_dir))
   - name: status
     release: zookeeper
   vm_type: ((zookeeper_vm_type))
