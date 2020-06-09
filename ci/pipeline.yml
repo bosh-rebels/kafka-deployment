@@ -195,6 +195,7 @@ jobs:
         zookeeper_sha1: ((.:zookeeper_sha1))
         zookeeper_stemcell: default
         zookeeper_vm_type: default
+        zookeeper_data_log_dir: /var/vcap/store/zookeeper
         kafka_auto_create_topics_enable: true
         kafka_delete_topic: true
         kafka_offsets_topic_replication_factor: 2
