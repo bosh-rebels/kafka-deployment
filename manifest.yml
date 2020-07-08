@@ -1,4 +1,6 @@
 ---
+name: ((deployment_name))
+
 addons:
 - name: bpm
   jobs:
@@ -17,7 +19,7 @@ instance_groups:
   - name: status
     release: zookeeper
   vm_type: ((zookeeper_vm_type))
-  stemcell: ((zookeeper_stemcell))
+  stemcell: default
   persistent_disk_type: ((zookeeper_persistent_disk_type))
   networks: [{name: ((zookeeper_network))}]
 - name: smoke-tests
@@ -25,7 +27,7 @@ instance_groups:
   azs: ((azs))
   instances: 1
   vm_type: ((smoke_tests_vm_type))
-  stemcell: ((smoke_tests_stemcell))
+  stemcell: default
   networks: [{name: ((smoke_tests_network))}]
   jobs:
   - name: smoke-tests
@@ -34,7 +36,7 @@ instance_groups:
   azs: ((azs))
   instances: ((kafka_instances))
   vm_type: ((kafka_vm_type))
-  stemcell: ((kafka_stemcell))
+  stemcell: default
   persistent_disk_type: ((kafka_persistent_disk_type))
   networks: [{name: ((kafka_network))}]
   jobs:
@@ -52,7 +54,7 @@ instance_groups:
   azs: ((azs))
   instances: 1
   vm_type: ((sanitytest_vm_type))
-  stemcell: ((sanitytest_stemcell))
+  stemcell: default
   networks: [{name: ((sanitytest_network))}]
   jobs:
   - name: sanitytest
@@ -62,7 +64,7 @@ instance_groups:
   azs: ((azs))
   instances: 1
   vm_type: ((generatetopics_vm_type))
-  stemcell: ((generatetopics_stemcell))
+  stemcell: default
   networks: [{name: ((generatetopics_network))}]
   jobs:
   - name: generatetopics
@@ -76,11 +78,9 @@ instance_groups:
     properties:
       password: ((cmak_password))
   vm_type: ((cmak_vm_type))
-  stemcell: ((cmak_stemcell))
+  stemcell: default
   persistent_disk_type: ((cmak_persistent_disk_type))
   networks: [{name: ((cmak_network))}]
-
-name: ((deployment_name))
 
 releases:
 - name: bpm
@@ -97,9 +97,9 @@ releases:
   version: ((cmak_version))
 
 stemcells:
-- alias: default
-  os: ((kafka_deployment_stemcell_os))
-  version: ((kafka_deployment_stemcell_version))
+- os: ((stemcell_os))
+  alias: default
+  version: ((stemcell_version))
 
 update:
   canaries: 1
