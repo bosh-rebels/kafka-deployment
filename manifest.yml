@@ -7,7 +7,7 @@ addons:
 
 instance_groups:
 - name: zookeeper
-  azs: [z1, z2, z3]
+  azs: ((azs))
   instances: ((zookeeper_instances))
   jobs:
   - name: zookeeper
@@ -22,7 +22,7 @@ instance_groups:
   networks: [{name: ((zookeeper_network))}]
 - name: smoke-tests
   lifecycle: errand
-  azs: [z1, z2, z3]
+  azs: ((azs))
   instances: 1
   vm_type: ((smoke_tests_vm_type))
   stemcell: ((smoke_tests_stemcell))
@@ -31,7 +31,7 @@ instance_groups:
   - name: smoke-tests
     release: zookeeper
 - name: kafka
-  azs: [z1, z2, z3]
+  azs: ((azs))
   instances: ((kafka_instances))
   vm_type: ((kafka_vm_type))
   stemcell: ((kafka_stemcell))
@@ -49,7 +49,7 @@ instance_groups:
  
 - name: sanitytest
   lifecycle: errand
-  azs: [z1, z2, z3]
+  azs: ((azs))
   instances: 1
   vm_type: ((sanitytest_vm_type))
   stemcell: ((sanitytest_stemcell))
@@ -59,7 +59,7 @@ instance_groups:
     release: kafka
 - name: generatetopics
   lifecycle: errand
-  azs: [z1, z2, z3]
+  azs: ((azs))
   instances: 1
   vm_type: ((generatetopics_vm_type))
   stemcell: ((generatetopics_stemcell))
@@ -68,7 +68,7 @@ instance_groups:
   - name: generatetopics
     release: kafka
 - name: cmak
-  azs: [z1, z2, z3]
+  azs: ((azs))
   instances: ((cmak_instances))
   jobs:
   - name: cmak
