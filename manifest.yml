@@ -1,6 +1,4 @@
 ---
-name: ((deployment_name))
-
 addons:
 - name: bpm
   jobs:
