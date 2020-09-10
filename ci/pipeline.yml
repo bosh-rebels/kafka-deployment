@@ -4,6 +4,21 @@ resource_types:
   source:
     repository: cloudfoundry/bosh-deployment-resource
 
+s3_bucket_semver: &s3_bucket_semver
+  driver: s3
+  region_name: ((s3_region))
+  initial_version: 0.0.1
+  bucket: ((s3_bucket_semver))
+  key: deployments/kafka/version
+  access_key_id: ((s3_access_key_id))
+  secret_access_key: ((s3_secret_access_key))
+
+s3_bucket_binary: &s3_bucket_binary
+  region_name: ((s3_region))
+  bucket: ((s3_bucket_binary))
+  access_key_id: ((s3_access_key_id))
+  secret_access_key: ((s3_secret_access_key))
+
 resources:
 - name: kafka-deployment
   type: git
@@ -28,75 +43,50 @@ resources:
 
 - name: delete-deployment
   type: bosh-deployment
-  source: 
+  source:
     <<: *deploy-release-source
 
 - name: running-version
   type: semver
   source:
-    driver: s3
-    region_name: ((s3_region))
-    initial_version: 0.0.1
-    bucket: bosh-releases-semver-rebels
+    <<: *s3_bucket_semver
     key: deployments/kafka/version
-    access_key_id: ((s3_access_key_id))
-    secret_access_key: ((s3_secret_access_key))
-  
+
 - name: bumped-version
   type: semver
   source:
-    driver: s3
-    region_name: ((s3_region))
-    initial_version: 0.0.1
-    bucket: bosh-releases-semver-rebels
+    <<: *s3_bucket_semver
     key: deployments/kafka/version
-    access_key_id: ((s3_access_key_id))
-    secret_access_key: ((s3_secret_access_key))
 
 - name: kafka-compiled-release
   type: s3
   source:
-    region_name: ((s3_region))
-    bucket: binary-releases-repo-rebels
+    <<: *s3_bucket_binary
     regexp: kafka/kafka-(.*)-ubuntu-xenial-((stemcell_version))-.*.tgz
-    access_key_id: ((s3_access_key_id))
-    secret_access_key: ((s3_secret_access_key))
 
 - name: zookeeper-compiled-release
   type: s3
   source:
-    region_name: ((s3_region))
-    bucket: binary-releases-repo-rebels
+    <<: *s3_bucket_binary
     regexp: zookeeper/zookeeper-(.*)-ubuntu-xenial-((stemcell_version))-.*.tgz
-    access_key_id: ((s3_access_key_id))
-    secret_access_key: ((s3_secret_access_key))
 
 - name: cmak-compiled-release
   type: s3
   source:
-    region_name: ((s3_region))
-    bucket: binary-releases-repo-rebels
+    <<: *s3_bucket_binary
     regexp: cmak/cmak-(.*)-ubuntu-xenial-((stemcell_version))-.*.tgz
-    access_key_id: ((s3_access_key_id))
-    secret_access_key: ((s3_secret_access_key))
 
 - name: bpm-compiled-release
   type: s3
   source:
-    region_name: ((s3_region))
-    bucket: binary-releases-repo-rebels
+    <<: *s3_bucket_binary
     regexp: "bpm/bpm-(.*)-ubuntu-xenial-((stemcell_version))-.*.tgz"
-    access_key_id: ((s3_access_key_id))
-    secret_access_key: ((s3_secret_access_key))
 
 - name: kafka-deployment-current-tarball
   type: s3
   source:
-    region_name: ((s3_region))
-    bucket: binary-releases-repo-rebels
+    <<: *s3_bucket_binary
     regexp: "deployments/kafka/kafka-(.*).tgz"
-    access_key_id: ((s3_access_key_id))
-    secret_access_key: ((s3_secret_access_key))
     initial_path: "deployments/kafka/kafka-0.0.0.tgz"
 
 jobs:
@@ -213,7 +203,7 @@ jobs:
             BOSH_CA_CERT: ((bosh_ca_cert))
             BOSH_CLIENT: ((bosh_client))
             BOSH_CLIENT_SECRET: ((bosh_client_secret))
-        
+
         - put: running-version
           params: {file: target/version}
 
