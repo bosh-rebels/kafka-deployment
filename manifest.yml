@@ -41,13 +41,16 @@ instance_groups:
   jobs:
   - name: kafka
     release: kafka
-    properties: 
+    properties:
       auto_create_topics_enable: ((kafka_auto_create_topics_enable))
       delete_topic: ((kafka_delete_topic))
       offsets_topic_replication_factor: ((kafka_offsets_topic_replication_factor))
       transaction_state_log_min_isr: ((kafka_transaction_state_log_min_isr))
       topics: ((kafka_topics))
- 
+  - name: reassignpartitions
+    release: kafka
+    properties:
+      topics: ((reassignpartitions_topics))
 - name: sanitytest
   lifecycle: errand
   azs: ((azs))
