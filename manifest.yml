@@ -17,20 +17,15 @@ instance_groups:
       data_log_dir: ((zookeeper_data_log_dir))
   - name: status
     release: zookeeper
+
+  - name: smoke-tests
+    release: zookeeper
+
   vm_type: ((zookeeper_vm_type))
   stemcell: default
   persistent_disk_type: ((zookeeper_persistent_disk_type))
   networks: [{name: ((zookeeper_network))}]
-- name: smoke-tests
-  lifecycle: errand
-  azs: ((azs))
-  instances: 1
-  vm_type: ((smoke_tests_vm_type))
-  stemcell: default
-  networks: [{name: ((smoke_tests_network))}]
-  jobs:
-  - name: smoke-tests
-    release: zookeeper
+
 - name: kafka
   azs: ((azs))
   instances: ((kafka_instances))
