@@ -47,30 +47,18 @@ instance_groups:
       offsets_topic_replication_factor: ((kafka_offsets_topic_replication_factor))
       transaction_state_log_min_isr: ((kafka_transaction_state_log_min_isr))
       topics: ((kafka_topics))
+
   - name: reassignpartitions
     release: kafka
     properties:
       topics: ((reassignpartitions_topics))
-- name: sanitytest
-  lifecycle: errand
-  azs: ((azs))
-  instances: 1
-  vm_type: ((sanitytest_vm_type))
-  stemcell: default
-  networks: [{name: ((sanitytest_network))}]
-  jobs:
+
   - name: sanitytest
     release: kafka
-- name: generatetopics
-  lifecycle: errand
-  azs: ((azs))
-  instances: 1
-  vm_type: ((generatetopics_vm_type))
-  stemcell: default
-  networks: [{name: ((generatetopics_network))}]
-  jobs:
+
   - name: generatetopics
     release: kafka
+
 - name: cmak
   azs: ((azs))
   instances: ((cmak_instances))
