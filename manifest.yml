@@ -54,6 +54,9 @@ instance_groups:
   - name: generatetopics
     release: kafka
 
+  - name: startconnector
+    release: kafka
+
 - name: cmak
   azs: ((azs))
   instances: ((cmak_instances))
